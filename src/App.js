@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from 'react'
+import * as S from './App.styled'
+import AppRoutes from './routes'
+import { useRefreshTokenMutation } from './Service/AdsApi'
 
 function App() {
+  const [refreshToken] = useRefreshTokenMutation()
+
+  const handleRefreshToken = () => {
+    refreshToken({
+      access_token: localStorage.getItem('access_token'),
+      refresh_token: localStorage.getItem('refresh_token'),
+    })
+  }
+
+  useEffect(() => {
+    handleRefreshToken()
+    const interval = setInterval(() => {
+      handleRefreshToken()
+    }, 60000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const token = localStorage.getItem('access_token')
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <S.MainApp>
+      <AppRoutes />
+    </S.MainApp>
+  )
 }
 
-export default App;
+export default App
