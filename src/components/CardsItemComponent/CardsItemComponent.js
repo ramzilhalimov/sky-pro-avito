@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import * as S from './CardsItemComponentStyle'
-import Skeleton from 'react-loading-skeleton'
+import { Loader } from '../../helpers'
 
 const CardsItemComponent = ({
   place,
@@ -12,33 +12,28 @@ const CardsItemComponent = ({
   date,
 }) => {
   const createdTime = new Date(date)
-  const formattedTime = `${createdTime.getHours()}:${
+  const formattedTime = `${createdTime.getHours()} : ${
     createdTime.getMinutes() < 10 ? '0' : ''
   }${createdTime.getMinutes()}`
 
+  if (isLoading) return <Loader />
+
   return (
-    <>
-      {isLoading ? (
-        <Skeleton count={1} />
-      ) : (
-        <Link to={`/ad/${advId}`}>
-          {' '}
-          <S.CardsItem>
-            <S.CardsCard>
-              <S.CardsImage>
-                <S.CardsImageImg src={picture} />
-              </S.CardsImage>
-              <S.CardContent>
-                <S.CardTitle>{title}</S.CardTitle>
-                <S.CardPrice>{price} ₽</S.CardPrice>
-                <S.CardPlace>{place}</S.CardPlace>
-                <S.CardDate>Сегодня в {formattedTime}</S.CardDate>
-              </S.CardContent>
-            </S.CardsCard>
-          </S.CardsItem>
-        </Link>
-      )}
-    </>
+    <Link to={`/ad/${advId}`}>
+      <S.CardsItem>
+        <S.CardsCard>
+          <S.CardsImage>
+            <S.CardsImageImg src={picture} />
+          </S.CardsImage>
+          <S.CardContent>
+            <S.CardTitle>{title}</S.CardTitle>
+            <S.CardPrice>{price} ₽</S.CardPrice>
+            <S.CardPlace>{place}</S.CardPlace>
+            <S.CardDate>Сегодня в {formattedTime}</S.CardDate>
+          </S.CardContent>
+        </S.CardsCard>
+      </S.CardsItem>
+    </Link>
   )
 }
 

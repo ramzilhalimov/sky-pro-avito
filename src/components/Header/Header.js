@@ -7,7 +7,7 @@ const Header = ({ data, profileKey, Authorization }) => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const Logut = () => {
+  const forceLogout = () => {
     localStorage.clear()
     window.location.href = '/'
   }
@@ -30,7 +30,7 @@ const Header = ({ data, profileKey, Authorization }) => {
             >
               Разместить объявление
             </S.HeaderBtnPutAd>
-            <S.HeaderBtnLk onClick={Logut}>Выйти</S.HeaderBtnLk>
+            <S.HeaderBtnLk onClick={forceLogout}>Выйти</S.HeaderBtnLk>
           </>
         ) : Authorization ? (
           <>

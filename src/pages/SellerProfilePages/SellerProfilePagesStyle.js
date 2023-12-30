@@ -46,10 +46,6 @@ export const MainH2 = styled.h2`
   color: #000000;
   margin-bottom: 30px;
 
-  //   &:hover::before {
-  //     border-top: 2px solid #0080c1;
-  //     border-left: 2px solid #0080c1;
-  //   }
 
   @media screen and (max-width: ${maxMobileWidthTwo}) {
     font-size: 24px;
@@ -198,7 +194,7 @@ export const SellerImgMob = styled.div`
 export const SellerImgMobImg = styled.img`
   @media screen and (max-width: ${maxMobileWidthTwo}) {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
     -o-object-fit: cover;
     object-fit: cover;
@@ -250,7 +246,6 @@ export const ContentCards = styled.div`
   scrollbar-width: thin;
   scrollbar-width: 0px;
   height: 600px;
-  // height: 100vh;
 
   &::-webkit-scrollbar {
     width: 0px;

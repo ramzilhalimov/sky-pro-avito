@@ -2,22 +2,29 @@ import Footer from '../../components/Footer/Footer'
 import Header from '../../components/Header/Header'
 import MainMenu from '../../components/MainMenu/MainMenu'
 import * as S from './SellerProfilePagesStyle'
-import { useGetAdsUserQuery, useGetUserInfoQuery } from '../../Service/AdsApi'
+import {
+  useGetAdsCurrentUserQuery,
+  useGetUserInfoQuery,
+} from '../../Service/AdsApi'
 import { useState } from 'react'
 import CardsItemComponent from '../../components/CardsItemComponent/CardsItemComponent'
+import { Loader } from '../../helpers'
+import { useParams, useNavigate } from 'react-router-dom'
 
 const SellerProfilePages = () => {
+  
   const [phone, setPhone] = useState(false)
-  const { data, isLoading } = useGetAdsUserQuery()
-  const { data: user, isLoading: isLoading2 } = useGetUserInfoQuery()
-  if (isLoading || isLoading2) return <div>hujh</div>
-  const profileKey = true
+  const { id } = useParams()
+  const { data, isLoading } = useGetAdsCurrentUserQuery(id)
+  const { data: user, isLoading: isLoading2 } = useGetUserInfoQuery(id)
+  const token = localStorage.getItem('access_token')
+  const Authorization = !!token
 
   const handlePhoneClick = () => {
     setPhone(true)
   }
 
-  const sellsFromDate = new Date(user.sells_from)
+  const sellsFromDate = new Date(user?.sells_from)
   const monthNames = [
     'января',
     'февраля',
@@ -36,10 +43,12 @@ const SellerProfilePages = () => {
     monthNames[sellsFromDate.getMonth()]
   } ${sellsFromDate.getFullYear()}`
 
+  if (isLoading2) return <Loader />
+
   return (
     <S.Wrapper>
       <S.Container>
-        <Header data={data} profileKey={profileKey} />
+        <Header data={data} Authorization={Authorization} />
         <S.MainContainer>
           <S.MainCenterBlock>
             <MainMenu />
@@ -63,7 +72,10 @@ const SellerProfilePages = () => {
                     </S.SellerCity>
                     <S.SellerImgMobBlock>
                       <S.SellerImgMob>
-                        <S.SellerImgMobImg alt="" src={user?.avatar} />
+                        <S.SellerImgMobImg
+                          alt=""
+                          src={`http://localhost:8090/${user?.avatar}`}
+                        />
                       </S.SellerImgMob>
                     </S.SellerImgMobBlock>
                     <S.SellerBtn onClick={handlePhoneClick}>
@@ -90,12 +102,16 @@ const SellerProfilePages = () => {
             </S.MainProfileSell>
             <S.MainTitle>Товары продавца</S.MainTitle>
             <S.ContentCards>
-              {data.map((ad, index) => (
+              {data?.map((ad, index) => (
                 <CardsItemComponent
                   advId={ad.id}
                   key={index}
                   title={ad.title}
-                  picture={`http://localhost:8090/${ad.images[0]?.url}`}
+                  picture={
+                    ad.images[0]
+                      ? `http://localhost:8090/${ad.images[0].url}`
+                      : (src = '/img/net-foto.png')
+                  }
                   price={ad.price}
                   date={ad.created_on}
                   place={ad.user.city}

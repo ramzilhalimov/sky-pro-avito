@@ -3,21 +3,22 @@ import CardsItemComponent from '../../components/CardsItemComponent/CardsItemCom
 import Footer from '../../components/Footer/Footer'
 import Header from '../../components/Header/Header'
 import Search from '../../components/Search/Search'
-import { useGetAdsQuery, useGetUserInfoQuery } from '../../Service/AdsApi'
+import { useGetAllAdsQuery, useGetUserInfoQuery } from '../../Service/AdsApi'
 import * as S from './MainPagesStyle'
 import { setAds } from '../../store/slices/userSlice'
 import { useEffect, useState } from 'react'
+import { Loader } from '../../helpers'
 
 const MainPages = () => {
   const dispatch = useDispatch()
   const [searchValue, setSearchValue] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const ads = useSelector((state) => state.user.ads)
-  const { data, isLoading } = useGetAdsQuery()
+  const { data, isLoading } = useGetAllAdsQuery()
   const token = localStorage.getItem('access_token')
   const Authorization = !!token
   const { data: userInfo, isLoading: loadUser } = useGetUserInfoQuery()
-
+  
   const handleSearchClick = (event) => {
     event.preventDefault()
     setSearchResults(
@@ -43,12 +44,11 @@ const MainPages = () => {
       dispatch(setAds(data))
     }
   }, [data, isLoading])
-
   if (userInfo) {
     localStorage.setItem('id_user', userInfo.id)
   }
 
-  if (isLoading || loadUser) return <div>идет загрузка</div>
+  if (isLoading || loadUser) return <Loader />
   return (
     <S.Wrapper>
       <S.Container>
@@ -66,24 +66,32 @@ const MainPages = () => {
               ) : null}
               <S.ContentCards>
                 {searchResults === ''
-                  ? data.map((ad, index) => (
+                  ? data.map((ad, index, src) => (
                       <CardsItemComponent
                         advId={ad.id}
                         key={index}
                         title={ad.title}
-                        picture={`http://localhost:8090/${ad.images[0]?.url}`}
+                        picture={
+                          ad.images[0]
+                            ? `http://localhost:8090/${ad.images[0].url}`
+                            : (src = '/img/net-foto.png')
+                        }
                         price={ad.price}
                         date={ad.created_on}
                         place={ad.user.city}
                         isLoading={isLoading}
                       />
                     ))
-                  : searchResults.map((ad, index) => (
+                  : searchResults.map((ad, index, src) => (
                       <CardsItemComponent
                         advId={ad.id}
                         key={index}
                         title={ad.title}
-                        picture={`http://localhost:8090/${ad.images[0]?.url}`}
+                        picture={
+                          ad.images[0]
+                            ? `http://localhost:8090/${ad.images[0].url}`
+                            : (src = '/img/net-foto.png')
+                        }
                         price={ad.price}
                         date={ad.created_on}
                         place={ad.user.city}

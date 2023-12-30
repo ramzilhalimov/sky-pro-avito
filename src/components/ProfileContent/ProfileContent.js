@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  useChangeAvatarMutation,
+  useUploadUserAvatarMutation,
   useUserUpdateMutation,
 } from '../../Service/AdsApi'
 import MainMenu from '../MainMenu/MainMenu'
@@ -14,7 +14,7 @@ const ProfileContent = ({ user }) => {
     city: user?.city,
     phone: user?.phone,
   })
-  const [changeAvatar] = useChangeAvatarMutation()
+  const [changeAvatar] = useUploadUserAvatarMutation()
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar)
 
   useEffect(() => {
@@ -30,8 +30,8 @@ const ProfileContent = ({ user }) => {
     })
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (event) => {
+    event.preventDefault()
     try {
       const updatedData = await UpdateUser(userData).unwrap()
     } catch (error) {
@@ -40,21 +40,19 @@ const ProfileContent = ({ user }) => {
   }
 
   const handleImageChange = async (event) => {
-    let file = event.target.files?.[0]
-    if (file) {
-      setAvatarUrl(file)
-      const reader = new FileReader()
-      reader.onload = function () {
-        fetch(reader.result)
-          .then((res) => res.blob())
-          .then((blob) => {
-            const formData = new FormData()
-            formData.append('file', blob, 'img.gpg')
-            changeAvatar(formData)
-          })
-        setAvatarUrl(user.data?.avatar)
-      }
-      reader.readAsDataURL(file)
+    event.preventDefault()
+    const selectedImg = event.target.files[0]
+    if (!selectedImg) {
+      console.log('Файл не выбран')
+      return
+    }
+    try {
+      const formData = new FormData()
+      formData.append('file', selectedImg)
+      await changeAvatar(formData)
+      setAvatarUrl(URL.createObjectURL(selectedImg))
+    } catch (error) {
+      console.error('Ошибка при изменении аватара', error)
     }
   }
 
@@ -82,9 +80,9 @@ const ProfileContent = ({ user }) => {
             <S.SettingsRight>
               <S.SettingForm action="#" onSubmit={handleSubmit}>
                 <S.SettingsDiv>
-                  <S.Label htmlFor="fname">Имя</S.Label>
+                  <S.Label>Имя</S.Label>
                   <S.SettingInputAll
-                    id="settings-fname"
+                    id="settings-name"
                     name="name"
                     type="text"
                     value={userData?.name}
@@ -93,7 +91,7 @@ const ProfileContent = ({ user }) => {
                   />
                 </S.SettingsDiv>
                 <S.SettingsDiv>
-                  <S.Label htmlFor="lname">Фамилия</S.Label>
+                  <S.Label>Фамилия</S.Label>
                   <S.SettingInputAll
                     id="settings-lname"
                     name="surname"
@@ -104,7 +102,7 @@ const ProfileContent = ({ user }) => {
                   />
                 </S.SettingsDiv>
                 <S.SettingsDiv>
-                  <S.Label htmlFor="city">Город</S.Label>
+                  <S.Label>Город</S.Label>
                   <S.SettingInputAll
                     id="settings-city"
                     name="city"
@@ -125,11 +123,7 @@ const ProfileContent = ({ user }) => {
                     placeholder="+79161234567"
                   />
                 </S.SettingsDiv>
-                <S.SettingBtn
-                  id="settings-btn"
-                  type="submit"
-                  onClick={() => handleSubmit()}
-                >
+                <S.SettingBtn id="settings-btn" type="submit">
                   Сохранить
                 </S.SettingBtn>
               </S.SettingForm>

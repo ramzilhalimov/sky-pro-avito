@@ -221,7 +221,7 @@ export const FormNewArtBlock = styled.div`
   }
 `
 
-export const FormNewArtLabel = styled.label`
+export const FormNewArtLabel = styled.p`
   margin-bottom: 4px;
   font-size: 16px;
   line-height: 24px;
@@ -493,7 +493,7 @@ export const FormNewArtImgImg2 = styled.img`
   width: 90px;
   height: 90px;
 `
-export const FormNewArtiLabel = styled.label``
+export const FormNewArtiLabel = styled.p``
 export const FormNewArtInputPrice = styled.input`
   width: 200px;
   color: #000000;
@@ -602,7 +602,7 @@ background-color: #FFFFFF;
 export const FormNewArtBtnPub = styled.button`
   width: 181px;
   height: 50px;
-  background: #d9d9d9;
+  background-color: #009ee4;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
   font-size: 16px;

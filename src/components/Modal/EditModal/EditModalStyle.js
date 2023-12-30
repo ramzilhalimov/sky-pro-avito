@@ -230,7 +230,7 @@ export const FormNewArtBlock = styled.div`
   }
 `
 
-export const FormNewArtLabel = styled.label`
+export const FormNewArtLabel = styled.p`
   margin-bottom: 4px;
   font-size: 16px;
   line-height: 24px;
@@ -498,7 +498,7 @@ export const FormNewArtImgImg = styled.img`
     object-fit: cover;
   }
 `
-export const FormNewArtiLabel = styled.label`
+export const FormNewArtiLabel = styled.p`
   @media screen and (max-width: 600px) {
     padding-bottom: 5px;
   }
@@ -611,7 +611,7 @@ background-color: #FFFFFF;
 export const FormNewArtBtnPub = styled.button`
   width: 181px;
   height: 50px;
-  background: #d9d9d9;
+  background-color: #009ee4;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
   font-size: 16px;

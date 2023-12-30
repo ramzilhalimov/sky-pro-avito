@@ -1,12 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { forceLogout } from '../helpers'
 
 const baseQueryWithReauth = async (argc, api, extraOptions) => {
   const baseQuery = fetchBaseQuery({
     baseUrl: 'http://localhost:8090/',
     prepareHeaders: (headers) => {
       const token = localStorage.getItem('access_token')
-      console.debug('Токен из стора', { token })
-      if (token) {
+      if (token !== null && token !== undefined) {
         headers.set('authorization', `Bearer ${token}`)
       }
       return headers
@@ -14,24 +14,35 @@ const baseQueryWithReauth = async (argc, api, extraOptions) => {
   })
 
   const result = await baseQuery(argc, api, extraOptions)
-  console.debug('результат первого запроса', { result })
-
-  const forceLogout = () => {
-    console.debug('Принудительная авторизация')
-    localStorage.clear()
-    window.location.href = '/login'
-  }
-
-  if (result?.status !== 401) {
+  if (result?.error?.status !== 401) {
     return result
   }
 
-  const authorization =
-    api.getState().authorization ?? localStorage.getItem('refresh')
-  console.log(authorization)
-  if (!authorization.refresh) {
+  const refreshResult = await baseQuery(
+    {
+      url: 'auth/login',
+      method: 'PUT',
+      body: {
+        refresh_token: localStorage.getItem('refresh_token'),
+        access_token: localStorage.getItem('access_token'),
+      },
+    },
+    api,
+    extraOptions
+  )
+  console.debug(refreshResult)
+  if (!refreshResult.data.access_token && !refreshResult.data.refresh_token) {
     return forceLogout()
   }
+  localStorage.setItem('access_token', refreshResult.data.access_token)
+  localStorage.setItem('refresh_token', refreshResult.data.refresh_token)
+
+  const retryResult = await baseQuery(args, api, extraOptions)
+
+  if (retryResult?.error?.status === 401) {
+    return forceLogout()
+  }
+  return retryResult
 }
 
 export const AdsApi = createApi({
@@ -39,7 +50,7 @@ export const AdsApi = createApi({
   tagTypes: ['Ads'],
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    getAds: builder.query({
+    getAllAds: builder.query({
       query: () => 'ads',
       providesTags: (result) =>
         result
@@ -50,19 +61,34 @@ export const AdsApi = createApi({
           : [{ type: 'Ads', id: 'LIST' }],
     }),
     getAdsId: builder.query({
-      query: (adId) => `ads/${adId}`,
+      query: (id) => `ads/${id}`,
       providesTags: ['Ads'],
     }),
     getUserInfo: builder.query({
-      query: () => `user`,
+      query: () => ({
+        url: 'user',
+      }),
+      transformResponse: (response) => {
+        localStorage.setItem('user_register_id', response.id)
+        localStorage.setItem('user_register_email', response.email)
+        localStorage.setItem('user_register_city', response.city)
+        localStorage.setItem('user_register_name', response.name)
+        localStorage.setItem('user_register_surname', response.surname)
+        localStorage.setItem('user_register_phone', response.phone)
+        localStorage.setItem('user_register_avatar', response.avatar)
+        localStorage.setItem('user_data', JSON.stringify(response))
+        return response
+      },
       providesTags: ['Ads'],
     }),
-    getAdsUser: builder.query({
+    getAdsCurrentUser: builder.query({
       query: () => `ads/me`,
+
       providesTags: ['Ads'],
     }),
     getAllCurrentUserComments: builder.query({
       query: (id) => `ads/${id}/comments`,
+
       providesTags: (result) =>
         result
           ? [
@@ -85,10 +111,13 @@ export const AdsApi = createApi({
     }),
 
     refreshToken: builder.mutation({
-      query: ({ access_token, refresh_token }) => ({
+      query: () => ({
         url: 'auth/login',
         method: 'PUT',
-        body: { access_token, refresh_token },
+        body: {
+          access_token: localStorage.getItem('access_token'),
+          refresh_token: localStorage.getItem('refresh_token'),
+        },
       }),
       onError: (error) => {
         console.error('Error refreshing token:', error)
@@ -100,7 +129,7 @@ export const AdsApi = createApi({
         return response
       },
     }),
-    addAds: builder.mutation({
+    addNewAds: builder.mutation({
       query: ({ title, description, price }) => ({
         url: `ads?title=${encodeURIComponent(
           title
@@ -112,6 +141,7 @@ export const AdsApi = createApi({
       }),
       invalidatesTags: ['Ads'],
     }),
+
     editAds: builder.mutation({
       query: ({ title, description, price, id }) => ({
         url: `ads/${id}`,
@@ -124,7 +154,7 @@ export const AdsApi = createApi({
       }),
       invalidatesTags: ['Ads'],
     }),
-    addImgAds: builder.mutation({
+    addNewImgAds: builder.mutation({
       query: ({ id, file }) => ({
         url: `ads/${id}/image`,
         method: 'POST',
@@ -133,7 +163,7 @@ export const AdsApi = createApi({
       invalidatesTags: ['Ads'],
     }),
 
-    delImgAds: builder.mutation({
+    deleteImgAds: builder.mutation({
       query: (data) => {
         const url = data.image.url
         return {
@@ -143,9 +173,9 @@ export const AdsApi = createApi({
       },
       invalidatesTags: ['Ads'],
     }),
-    delAdsId: builder.mutation({
-      query: ({ adId }) => {
-        return { url: `ads/${adId}`, method: 'DELETE' }
+    deleteAds: builder.mutation({
+      query: ({ id }) => {
+        return { url: `ads/${id}`, method: 'DELETE' }
       },
       invalidatesTags: ['Ads'],
     }),
@@ -157,31 +187,31 @@ export const AdsApi = createApi({
       }),
       invalidatesTags: ['Ads'],
     }),
-    changeAvatar: builder.mutation({
-      query: (fileData) => ({
+    uploadUserAvatar: builder.mutation({
+      query: (formData) => ({
         url: '/user/avatar',
         method: 'POST',
-        body: fileData,
+        body: formData,
       }),
-      invalidatesTags: ['Ads'],
+      providesTags: ['Ads'],
     }),
   }),
 })
 
 export const {
-  useGetAdsQuery,
+  useGetAllAdsQuery,
   useGetAdsIdQuery,
   useGetUserInfoQuery,
   useRefreshTokenMutation,
   useGetAllCommentsQuery,
   useAddCommentMutation,
   useGetAllCurrentUserCommentsQuery,
-  useAddAdsMutation,
+  useAddNewAdsMutation,
   useEditAdsMutation,
-  useAddImgAdsMutation,
-  useDelImgAdsMutation,
-  useDelAdsIdMutation,
+  useAddNewImgAdsMutation,
+  useDeleteImgAdsMutation,
+  useDeleteAdsMutation,
   useUserUpdateMutation,
-  useChangeAvatarMutation,
-  useGetAdsUserQuery,
+  useUploadUserAvatarMutation,
+  useGetAdsCurrentUserQuery,
 } = AdsApi

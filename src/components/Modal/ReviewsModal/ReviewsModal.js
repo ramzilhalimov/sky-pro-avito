@@ -8,10 +8,9 @@ import { ReviewItem } from './ReviewItem'
 
 export const ReviewsModal = ({ comments, onClose }) => {
   const modalRef = useRef(null)
-  const { adId } = useParams()
+  const { id } = useParams()
   const token = localStorage.getItem('access_token')
-
-  const [addComment, { isLoading }] = useAddCommentMutation(adId)
+  const [addComment, { isLoading }] = useAddCommentMutation(id)
   const [newComment, setNewComment] = useState('')
   const [error, setError] = useState(null)
   useEffect(() => {
@@ -36,7 +35,7 @@ export const ReviewsModal = ({ comments, onClose }) => {
       return
     }
     if (newComment) {
-      await addComment({ text: newComment, id: adId })
+      await addComment({ text: newComment, id: id })
       setNewComment('')
     }
   }
@@ -54,34 +53,25 @@ export const ReviewsModal = ({ comments, onClose }) => {
             <S.ModalScroll>
               {error && <S.Error>{error}</S.Error>}
               <S.ModalFormNewArt>
-                {!token ? (
-                  ''
-                ) : (
-                  <S.FormNewArtBlock>
-                    <S.FormNewArtLabel for="text">
-                      Добавить отзыв
-                    </S.FormNewArtLabel>
-                    <S.FormNewArtArea
-                      name="text"
-                      id="formArea"
-                      cols="auto"
-                      rows="5"
-                      placeholder="Введите описание"
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                    ></S.FormNewArtArea>
-                  </S.FormNewArtBlock>
-                )}
-                {!token ? (
-                  ''
-                ) : (
-                  <S.FormNewArtBtnPub
-                    onClick={handleAddComment}
-                    disabled={!newComment}
-                  >
-                    {isLoading ? 'Публикация...' : 'Опубликовать'}
-                  </S.FormNewArtBtnPub>
-                )}
+                <S.FormNewArtBlock>
+                  <S.FormNewArtLabel>Добавить отзыв</S.FormNewArtLabel>
+                  <S.FormNewArtArea
+                    name="text"
+                    id="formArea"
+                    cols="auto"
+                    rows="5"
+                    placeholder="Введите описание"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                  ></S.FormNewArtArea>
+                </S.FormNewArtBlock>
+
+                <S.FormNewArtBtnPub
+                  onClick={handleAddComment}
+                  disabled={!newComment}
+                >
+                  {isLoading ? 'Публикация...' : 'Опубликовать'}
+                </S.FormNewArtBtnPub>
               </S.ModalFormNewArt>
               <S.ModalReviews>
                 <S.ReviewsReview>

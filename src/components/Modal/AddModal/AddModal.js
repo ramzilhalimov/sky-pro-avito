@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
-  useAddAdsMutation,
-  useAddImgAdsMutation,
+  useAddNewAdsMutation,
+  useAddNewImgAdsMutation,
 } from '../../../Service/AdsApi'
 import * as S from './AddModalStyle'
 
@@ -12,34 +12,38 @@ export const AddModal = ({ data, onClose }) => {
   const [imageSrc, setImageSrc] = useState([])
   const [selectedImages, setSelectedImages] = useState([])
   const specificId = data.id
-  const [postAdsImage] = useAddImgAdsMutation(specificId)
-  const [addAds] = useAddAdsMutation()
+  const [postAdsImage] = useAddNewImgAdsMutation(specificId)
+  const [addAds] = useAddNewAdsMutation()
 
   const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files)
     setImageSrc([...imageSrc, files.flat()].flat())
-    const reader = new FileReader()
-
-    reader.onload = () => {
-      const imagesData = files.map((file) => ({
+    for (const file of files) {
+      const dataURL = await readFileAsDataURL(file)
+      const imageData = {
         file,
-        dataURL: reader.result,
-      }))
-      console.log('данные', imagesData)
-      setSelectedImages((prevImages) => [...prevImages, ...imagesData])
+        dataURL,
+      }
+      setSelectedImages((prevImages) => [...prevImages, imageData])
     }
-    files.forEach((file) => reader.readAsDataURL(file))
   }
 
+  const readFileAsDataURL = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
   const submitAds = async () => {
-    console.log('REF', imageSrc)
-    const formData = new FormData()
-    for (let i = 0; i < imageSrc.length; i++) {
-      formData.append('file', imageSrc[i])
-    }
     try {
       const result = await addAds({ title, description, price })
-      await postAdsImage({ id: result.data.id, file: formData })
+      for (let i = 0; i < imageSrc.length; i++) {
+        const formData = new FormData()
+        formData.append('file', imageSrc[i])
+        await postAdsImage({ id: result.data.id, file: formData })
+      }
     } catch (error) {
       console.log(error)
     }
@@ -55,18 +59,18 @@ export const AddModal = ({ data, onClose }) => {
           </S.ModalBtnClose>
           <S.ModalFormNewArt>
             <S.FormNewArtBlock>
-              <S.FormNewArtLabel htmlFor="text">Название</S.FormNewArtLabel>
+              <S.FormNewArtLabel>Название</S.FormNewArtLabel>
               <S.FormNewArtInput
                 type="text"
                 name="name"
-                id="formName"
+                id="formSurName"
                 placeholder="Введите
                   название"
                 onChange={(e) => setTitle(e.target.value)}
               ></S.FormNewArtInput>
             </S.FormNewArtBlock>
             <S.FormNewArtBlock>
-              <S.FormNewArtLabel htmlFor="text">Описание</S.FormNewArtLabel>
+              <S.FormNewArtLabel>Описание</S.FormNewArtLabel>
               <S.FormNewArtArea
                 name="text"
                 id="formArea"

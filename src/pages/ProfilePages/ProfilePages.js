@@ -2,15 +2,19 @@ import * as S from './ProfilePagesStyle'
 import Footer from '../../components/Footer/Footer'
 import Header from '../../components/Header/Header'
 import ProfileContent from '../../components/ProfileContent/ProfileContent'
-import { useGetAdsUserQuery, useGetUserInfoQuery } from '../../Service/AdsApi'
+import {
+  useGetAdsCurrentUserQuery,
+  useGetUserInfoQuery,
+} from '../../Service/AdsApi'
 import CardsItemComponent from '../../components/CardsItemComponent/CardsItemComponent'
+import { Loader } from '../../helpers'
 
 const ProfilePages = () => {
-  const { data, isLoading } = useGetAdsUserQuery()
+  const { data, isLoading } = useGetAdsCurrentUserQuery()
   const { data: user, isLoading: isLoading2 } = useGetUserInfoQuery()
-  if (isLoading || isLoading2) return <div>hujh</div>
-  const profileKey = true
 
+  const profileKey = true
+  if (isLoading2) return <Loader />
   return (
     <S.Wrapper>
       <S.Container>
@@ -19,12 +23,16 @@ const ProfilePages = () => {
           <ProfileContent user={user} />
           <S.MainContent>
             <S.ContentCards>
-              {data.map((ad, index) => (
+              {data?.map((ad, index) => (
                 <CardsItemComponent
                   advId={ad.id}
                   key={index}
                   title={ad.title}
-                  picture={`http://localhost:8090/${ad.images[0]?.url}`}
+                  picture={
+                    ad.images[0]
+                      ? `http://localhost:8090/${ad.images[0].url}`
+                      : (src = '/img/net-foto.png')
+                  }
                   price={ad.price}
                   date={ad.created_on}
                   place={ad.user.city}

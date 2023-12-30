@@ -246,7 +246,7 @@ export const FormNewArtBlock = styled.div`
   }
 `
 
-export const FormNewArtLabel = styled.label`
+export const FormNewArtLabel = styled.p`
   margin-bottom: 14px;
   font-size: 16px;
   line-height: 32px;
@@ -335,7 +335,7 @@ export const FormNewArtArea = styled.textarea`
 export const FormNewArtBtnPub = styled.button`
   width: 181px;
   height: 50px;
-  background: #d9d9d9;
+  background-color: #009ee4;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
   font-size: 16px;
