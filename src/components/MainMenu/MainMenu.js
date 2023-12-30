@@ -11,7 +11,7 @@ const MainMenu = () => {
       </S.MenuLogoLink>
       <S.MenuForm action="#">
         <S.MenuBtn onClick={() => navigate('/')}>
-          Вернуться на&nbsp;главную
+          Вернуться на главную
         </S.MenuBtn>
       </S.MenuForm>
     </S.MainMenu>

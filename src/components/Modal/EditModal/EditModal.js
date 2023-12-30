@@ -1,43 +1,24 @@
 import { useState } from 'react'
 import {
   useEditAdsMutation,
-  useAddImgAdsMutation,
-  useDelImgAdsMutation,
+  useAddNewImgAdsMutation,
+  useDeleteImgAdsMutation,
 } from '../../../Service/AdsApi'
 import * as S from './EditModalStyle'
 
 export const EditModal = ({ data, onClose }) => {
-  console.log('данные редактирования', data)
-
   const [title, setTitle] = useState(data.title)
   const [description, setDescription] = useState(data.description)
   const [price, setPrice] = useState(data.price)
   const [selectedImages, setSelectedImages] = useState([])
   const id = data.id
-  const [deleteImages] = useDelImgAdsMutation(id)
-  const [postAdsImage] = useAddImgAdsMutation(id)
-  console.log('цена из редактора', data.images)
+  const [deleteImages] = useDeleteImgAdsMutation(id)
+  const [postAdsImage] = useAddNewImgAdsMutation(id)
   const [imagesFromInput, setImagesFromInput] = useState([])
-  const [editAds, { isLoading, isError, isSuccess }] = useEditAdsMutation()
-
-  const handleFormSubmit = async () => {
-    try {
-      const result = await editAds({
-        title,
-        description,
-        price: Number(price),
-        id,
-      })
-      console.log(result)
-      console.log(isLoading, isSuccess)
-    } catch (error) {
-      console.log(isError)
-    }
-  }
+  const [editAds] = useEditAdsMutation()
 
   const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files)
-    console.log([...imagesFromInput, files.flat()].flat())
     setImagesFromInput([...imagesFromInput, files.flat()].flat())
     const reader = new FileReader()
     reader.onload = () => {
@@ -45,29 +26,35 @@ export const EditModal = ({ data, onClose }) => {
         file,
         dataURL: reader.result,
       }))
-      console.log('данные', imagesData)
       setSelectedImages((prevImages) => [...prevImages, ...imagesData])
     }
     files.forEach((file) => reader.readAsDataURL(file))
   }
 
-  const submitAds = async () => {
-    console.log('REF', imagesFromInput)
-    const formData = new FormData()
-    for (let i = 0; i < imagesFromInput.length; i++) {
-      formData.append('file', imagesFromInput[i])
+  const correctAds = async () => {
+    try {
+      const result = await editAds({
+        title,
+        description,
+        price: Number(price),
+        id,
+      })
+      for (let i = 0; i < imagesFromInput.length; i++) {
+        const formData = new FormData()
+        formData.append('file', imagesFromInput[i])
+        await postAdsImage({ id, file: formData })
+      }
+    } catch (error) {
+      console.log(error)
     }
-    console.log(formData)
-    await postAdsImage({ id, file: formData })
-    console.log(typeof price)
-    handleFormSubmit()
   }
 
-  const handleDeleteImage = async (image) => {
+  const handleDeleteImage = async (e, image) => {
+    e.preventDefault()
+    e.stopPropagation()
     const data = { image, id }
     try {
       await deleteImages(data)
-
       setSelectedImages((images) => images.filter((img) => img !== image))
     } catch (error) {
       console.error('Ошибка при удалении фотографии:', error)
@@ -83,7 +70,6 @@ export const EditModal = ({ data, onClose }) => {
           <S.ModalBtnClose onClick={onClose}>
             <S.ModalBtnCloseLine></S.ModalBtnCloseLine>
           </S.ModalBtnClose>
-
           <S.ModalFormNewArt>
             <S.FormNewArtBlock>
               <S.FormNewArtLabel htmlFor="text">Название</S.FormNewArtLabel>
@@ -112,14 +98,13 @@ export const EditModal = ({ data, onClose }) => {
                 <S.FormNewArtSpan>не более 5 фотографий</S.FormNewArtSpan>
               </S.FormNewArtP>
               <S.FormNewArtBarImg>
-                {/* на отображение тех которые есть в объявлении */}
                 {data &&
                   data.images.map((image, index) => (
                     <S.FormNewArtImg key={index}>
                       <S.DeleteImageBtnDiv>
                         <S.DeleteImageBtn
-                          onClick={() => {
-                            handleDeleteImage(image)
+                          onClick={(e) => {
+                            handleDeleteImage(e, image)
                           }}
                         >
                           Х
@@ -131,9 +116,7 @@ export const EditModal = ({ data, onClose }) => {
                       />
                     </S.FormNewArtImg>
                   ))}
-                {/* добавление новых */}
                 {[...Array(5 - data.images.length)].map((_, index) => (
-                  // {[...Array(5)].map((_, index) => (
                   <S.FormNewArtImg key={index}>
                     {selectedImages[index] ? (
                       <S.FormNewArtImgImg2
@@ -163,14 +146,14 @@ export const EditModal = ({ data, onClose }) => {
               <S.FormNewArtInputPrice
                 type="number"
                 name="price"
-                id="formName"
+                id="formPrice"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
             </S.FormNewArtBlock>
             <S.FormNewArtBtnPub
               onClick={() => {
-                submitAds()
+                correctAds()
                 onClose()
               }}
               id="btnPublish"

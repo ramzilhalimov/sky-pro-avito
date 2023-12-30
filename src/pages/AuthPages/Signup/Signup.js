@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import * as S from './RegisterStyle'
-import { registerUser } from '../../../components/Api/api'
+import * as S from './SignupStyle'
 import { useNavigate } from 'react-router-dom'
+import { useRegisterUserMutation } from '../../../Service/AuthApi'
 
-const Registration = () => {
+const Signup = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -12,6 +12,7 @@ const Registration = () => {
   const [repeatPassword, setRepeatPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
   const navigate = useNavigate()
+  const [registerUser, { isLoading }] = useRegisterUserMutation()
 
   const handleRegister = async (e) => {
     e.preventDefault()
@@ -29,11 +30,9 @@ const Registration = () => {
     }
 
     try {
-      await registerUser(email, password, name, surname, city)
-      console.log('Registration successful:', response)
+      await registerUser({ email, password, name, surname, city })
       navigate('/login')
     } catch (error) {
-      console.log('Registration error:', error)
       setErrorMessage(error.message)
     }
   }
@@ -42,7 +41,7 @@ const Registration = () => {
     <S.Wrapper>
       <S.ContainerSignup>
         <S.ModalBlock>
-          <S.ModalFormLogin onSubmit={handleRegister}>
+          <S.ModalFormLogin>
             <S.ModalLogo>
               <S.ModalLogoImg src="../img/logo-reg.png" alt="logo" />
             </S.ModalLogo>
@@ -92,7 +91,11 @@ const Registration = () => {
             <S.ErrorDiv>{errorMessage}</S.ErrorDiv>
 
             <S.ModalBtnSignupEnt>
-              <S.ModalBtnLink>Зарегистрироваться</S.ModalBtnLink>
+              <S.ModalBtnLink disabled={isLoading} onClick={handleRegister}>
+                {isLoading
+                  ? 'Осуществляется регистрация'
+                  : 'Зарегистрироваться'}
+              </S.ModalBtnLink>
             </S.ModalBtnSignupEnt>
           </S.ModalFormLogin>
         </S.ModalBlock>
@@ -101,4 +104,4 @@ const Registration = () => {
   )
 }
 
-export default Registration
+export default Signup

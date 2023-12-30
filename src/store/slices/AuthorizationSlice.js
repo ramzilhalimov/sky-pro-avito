@@ -1,9 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  access: '',
-  refresh: '',
-  user: '',
+  email: '',
+  password: '',
+  name: '',
+  access_token: '',
+  refresh_token: '',
+  token_type: '',
+  avatar: '',
+  city: '',
+  phone: '',
+  surname: '',
+  id: 0,
 }
 
 export const authorizationSlice = createSlice({
@@ -11,10 +19,9 @@ export const authorizationSlice = createSlice({
   initialState,
   reducers: {
     setAuthorization: (state, action) => {
-      const { access, refresh, user } = action.payload ?? initialState
+      const { access, refresh } = action.payload ?? initialState
       state.access = access
       state.refresh = refresh
-      state.user = user
     },
   },
 })

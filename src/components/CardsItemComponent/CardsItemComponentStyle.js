@@ -3,8 +3,6 @@ const maxMobileWidth = '890px'
 const maxMobileWidthTwo = '620px'
 const maxMobileWidthThree = '1158px'
 
-
-
 export const CardsItem = styled.div`
   margin: 0;
   @media screen and (max-width: ${maxMobileWidthTwo}) {
@@ -17,20 +15,12 @@ export const CardsCard = styled.div`
   display: flex;
   flex-direction: column;
 
-  // @media screen and (max-width: ${maxMobileWidth}) {
-  //   display: grid;
-  //   grid-template-columns: repeat(2, 270px);
-  // }
   @media screen and (max-width: ${maxMobileWidthTwo}) {
     width: 137px;
     height: 293px;
     display: flex;
     flex-direction: column;
   }
-  // @media screen and (max-width: ${maxMobileWidthThree}) {
-  //   display: grid;
-  //   grid-template-columns: repeat(3, 270px);
-  // }
 `
 export const CardsImage = styled.div`
   width: 270px;
@@ -38,7 +28,8 @@ export const CardsImage = styled.div`
   background-color: #f0f0f0;
 
   @media screen and (max-width: ${maxMobileWidthTwo}) {
-    width: 137px;
+    display: block;
+    width: 132px;
     height: 132px;
     background-color: #d9d9d9;
   }
@@ -59,7 +50,6 @@ export const CardsImageImg = styled.img`
   }
 `
 
-
 export const CardContent = styled.div``
 export const CardTitle = styled.h3`
   height: 52px;
@@ -74,16 +64,13 @@ export const CardTitle = styled.h3`
 
   @media screen and (max-width: ${maxMobileWidthTwo}) {
     height: 16px;
-    // height: auto;
     font-size: 14px;
     line-height: 17px;
     color: #009ee4;
     margin-bottom: 10px;
     margin-top: 10px;
   }
-
 `
-
 
 export const CardPrice = styled.p`
   color: #000000;

@@ -1,28 +1,28 @@
 import React, { useState } from 'react'
-import * as S from './LoginStyle'
-import { loginUser } from '../../../components/Api/api'
+import * as S from './SigninStyle'
 import { useNavigate } from 'react-router-dom'
+import { useLoginUserMutation } from '../../../Service/AuthApi'
+import { setAuthorization } from '../../../store/slices/authorizationSlice'
+import { useDispatch } from 'react-redux'
 
-const Login = () => {
+const Signin = () => {
+  const dispatch = useDispatch()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
   const navigate = useNavigate()
+  const [loginUser, { isLoading }] = useLoginUserMutation()
 
   const handleLogin = async (e) => {
     e.preventDefault()
-
     if (!email || !password) {
       setErrorMessage('Укажите почту/пароль')
       return
     }
 
     try {
-      const response = await loginUser(email, password)
-      console.log(response)
-      localStorage.setItem('email', email)
-      localStorage.setItem('access_token', response.access_token)
-      localStorage.setItem('refresh_token', response.refresh_token)
+      await loginUser({ email, password })
+      dispatch(setAuthorization())
       navigate('/')
     } catch (error) {
       console.error(error)
@@ -34,11 +34,10 @@ const Login = () => {
     <S.Wrapper>
       <S.ContainerEnter>
         <S.ModalBlock>
-          <S.ModalFormLogin onSubmit={handleLogin}>
+          <S.ModalFormLogin>
             <S.ModalLogo>
               <S.ModalLogoImg src="../img/logo-reg.png" alt="logo" />
             </S.ModalLogo>
-            {/* {isError && error && <S.Div>{error.message}</S.Div>} */}
             <S.ModalInputLogin
               type="text"
               name="login"
@@ -55,7 +54,9 @@ const Login = () => {
             />
             <S.ErrorDiv>{errorMessage}</S.ErrorDiv>
             <S.ModalBtnEnter id="btnEnter" onClick={handleLogin}>
-              <S.ModalBtnEnterA href="#">Войти</S.ModalBtnEnterA>
+              <S.ModalBtnEnterA disabled={isLoading} onClick={handleLogin}>
+                {isLoading ? 'Осуществляется вход' : 'Войти'}
+              </S.ModalBtnEnterA>
             </S.ModalBtnEnter>
             <S.ModalBtnSingup id="btnSignUp">
               <S.ModalBtnSingupA href="/register">
@@ -69,4 +70,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default Signin

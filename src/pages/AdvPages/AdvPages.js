@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   useGetAdsIdQuery,
   useGetAllCurrentUserCommentsQuery,
-  useDelAdsIdMutation,
+  useDeleteAdsMutation,
 } from '../../Service/AdsApi'
 import * as S from './AdvPagesStyle'
 import Footer from '../../components/Footer/Footer'
@@ -11,6 +11,8 @@ import MainMenu from '../../components/MainMenu/MainMenu'
 import { useState, useEffect } from 'react'
 import { ReviewsModal } from '../../components/Modal/ReviewsModal/ReviewsModal'
 import EditModal from '../../components/Modal/EditModal/EditModal'
+import 'react-loading-skeleton/dist/skeleton.css'
+import { Loader } from '../../helpers'
 
 const AdvPages = () => {
   const navigate = useNavigate()
@@ -20,14 +22,14 @@ const AdvPages = () => {
   const [phone, setPhone] = useState(false)
   const [adComments, setAdComments] = useState([])
   const [deleted, setDeleted] = useState(false)
-  const { adId } = useParams()
-  const { data: advComments } = useGetAllCurrentUserCommentsQuery(adId)
+  const { id } = useParams()
+  const { data: advComments } = useGetAllCurrentUserCommentsQuery(id)
 
   const handlePhoneClick = () => {
     setPhone(true)
   }
 
-  const [DeteleAds] = useDelAdsIdMutation(adId)
+  const [DeteleAds] = useDeleteAdsMutation(id)
   useEffect(() => {
     if (advComments) {
       setAdComments(advComments)
@@ -35,37 +37,35 @@ const AdvPages = () => {
   }, [advComments])
 
   let showEdit = false
-  const { data, isLoading } = useGetAdsIdQuery(adId)
-
-  const imageUrls = data?.images?.map(
-    (image) => `http://127.0.0.1:8090/${image.url}`
+  const { data, isLoading } = useGetAdsIdQuery(id)
+  const imageUrls = data?.images?.map((image) =>
+    image ? `http://127.0.0.1:8090/${image.url}` : (src = './img/net-foto.png')
   )
 
   const handleImageClick = (index) => {
     setSelectedImageIndex(index)
   }
   const currentUser = localStorage.getItem('id_user')
-  if (isLoading || !data) return <div>идет загрузка</div>
   const token = localStorage.getItem('access_token')
   const Authorization = !!token
 
   if (Authorization) {
-    localStorage.setItem('id_seller', data.user.id)
+    localStorage.setItem('id_seller', data?.user.id)
   }
-  if (data.user.id === parseInt(currentUser, 10)) {
+  if (data?.user.id === parseInt(currentUser, 10)) {
     showEdit = true
   }
   const DeleteAtdFunc = async () => {
     setDeleted(true)
-    DeteleAds({ adId: adId })
+    DeteleAds({ id: id })
     navigate('/')
   }
-  const createdTime = new Date(data.created_on)
+  const createdTime = new Date(data?.created_on)
   const formattedTime = `${createdTime.getHours()}:${
     createdTime.getMinutes() < 10 ? '0' : ''
   }${createdTime.getMinutes()}`
 
-  const sellsFromDate = new Date(data.user.sells_from)
+  const sellsFromDate = new Date(data?.user.sells_from)
   const monthNames = [
     'января',
     'февраля',
@@ -84,11 +84,13 @@ const AdvPages = () => {
     monthNames[sellsFromDate.getMonth()]
   } ${sellsFromDate.getFullYear()}`
 
+  if (isLoading) return <Loader />
+
   return (
     <div>
       <S.Wrapper>
         <S.Container>
-          <Header Authorization={Authorization} />
+          <Header data={data} Authorization={Authorization} />
           <S.Main>
             <S.MainContainer>
               <MainMenu />
@@ -103,7 +105,11 @@ const AdvPages = () => {
                   >
                     <S.ArticleImg>
                       <S.ArticleImgImg
-                        src={`http://127.0.0.1:8090/${data?.images[selectedImageIndex]?.url}`}
+                        src={
+                          data?.images[selectedImageIndex]
+                            ? `http://127.0.0.1:8090/${data?.images[selectedImageIndex]?.url}`
+                            : '/img/net-foto.png'
+                        }
                         alt=""
                       />
                     </S.ArticleImg>
@@ -114,10 +120,17 @@ const AdvPages = () => {
                             key={index}
                             onClick={() => handleImageClick(index)}
                           >
-                            <S.ArticleImgBarDivImg
-                              src={imageUrl}
-                              alt={`Image ${index + 1}`}
-                            />
+                            {imageUrl ? (
+                              <S.ArticleImgBarDivImg
+                                src={imageUrl}
+                                alt={`Image ${index + 1}`}
+                              />
+                            ) : (
+                              <S.ArticleImgBarDivImg
+                                src="../img/net-foto.png"
+                                alt={'Отсутствует изображение'`${index + 1}`}
+                              />
+                            )}
                           </S.ArticleImgBarDiv>
                         ))}
                     </S.ArticleImgBar>
@@ -130,13 +143,12 @@ const AdvPages = () => {
                     </S.ArticleImgBarMob>
                   </S.ArticleFillImg>
                 </S.ArticleLeft>
-
                 <S.ArticleRight>
                   <S.ArticleBlock>
-                    <S.ArticleTitle>{data.title}</S.ArticleTitle>
+                    <S.ArticleTitle>{data?.title}</S.ArticleTitle>
                     <S.ArticleInfo>
                       <S.ArticleDate>Сегодня в {formattedTime}</S.ArticleDate>
-                      <S.ArticleCity>{data.user.city}</S.ArticleCity>
+                      <S.ArticleCity>{data?.user.city}</S.ArticleCity>
                       <S.ArticleLink
                         onClick={(e) => {
                           e.preventDefault()
@@ -149,7 +161,7 @@ const AdvPages = () => {
                         Отзывы: {adComments ? adComments.length : '...'}
                       </S.ArticleLink>
                     </S.ArticleInfo>
-                    <S.ArticlePrice>{data.price} ₽</S.ArticlePrice>
+                    <S.ArticlePrice>{data?.price} ₽</S.ArticlePrice>
                     {showEdit ? (
                       <S.ArticleBtnBlock>
                         <S.ArticleBtnReact
@@ -170,7 +182,7 @@ const AdvPages = () => {
                       </S.ArticleBtnBlock>
                     ) : (
                       <S.ArticleBtnReact onClick={handlePhoneClick}>
-                        {data.user.phone === null ? (
+                        {data?.user.phone === null ? (
                           <S.ArticleBtnSpan>
                             Телефон продавца не указан
                           </S.ArticleBtnSpan>
@@ -191,18 +203,18 @@ const AdvPages = () => {
                     <S.ArticleAuthor>
                       <S.AuthorImg>
                         <S.AuthorImgImg
-                          src={`http://localhost:8090/${data.user.avatar}`}
+                          src={`http://localhost:8090/${data?.user.avatar}`}
                           alt=""
                         />
                       </S.AuthorImg>
                       <S.AuthorCont>
-                        <Link to="/sellerProfile">
+                        <Link to="/sellerProfile/:id">
                           <S.AuthorName
                             onClick={() => {
-                              navigate('/sellerProfile')
+                              navigate('/sellerProfile/:id')
                             }}
                           >
-                            {data.user.name}
+                            {data?.user.name}
                           </S.AuthorName>
                         </Link>
                         <S.AuthorAbout>
@@ -218,14 +230,14 @@ const AdvPages = () => {
             <S.MainContainer>
               <S.MainTitle>Описание товара</S.MainTitle>
               <S.MainContent>
-                <S.MainText>{data.description}</S.MainText>
+                <S.MainText>{data?.description}</S.MainText>
               </S.MainContent>
             </S.MainContainer>
             {isModalOpenReviews && (
               <ReviewsModal
                 onClose={() => setIsModalOpenReviews(false)}
                 comments={advComments}
-                advId={adId}
+                advId={id}
               />
             )}
           </S.Main>
