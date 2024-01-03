@@ -5,7 +5,7 @@ import { useLoginUserMutation } from '../../../Service/AuthApi'
 import { setAuthorization } from '../../../store/slices/authorizationSlice'
 import { useDispatch } from 'react-redux'
 
-const Signin = () => {
+export const Signin = () => {
   const dispatch = useDispatch()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -22,7 +22,13 @@ const Signin = () => {
 
     try {
       await loginUser({ email, password })
-      dispatch(setAuthorization())
+      dispatch(
+        setAuthorization({
+          access_token: 'access_token',
+          refresh_token: 'refresh_token',
+        })
+      )
+
       navigate('/')
     } catch (error) {
       console.error(error)
@@ -69,5 +75,3 @@ const Signin = () => {
     </S.Wrapper>
   )
 }
-
-export default Signin

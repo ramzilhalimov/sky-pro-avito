@@ -3,10 +3,10 @@ import {
   useUploadUserAvatarMutation,
   useUserUpdateMutation,
 } from '../../Service/AdsApi'
-import MainMenu from '../MainMenu/MainMenu'
+import {MainMenu} from '../MainMenu/MainMenu'
 import * as S from './ProfileContentStyle'
 
-const ProfileContent = ({ user }) => {
+export const ProfileContent = ({ user }) => {
   const [UpdateUser] = useUserUpdateMutation()
   const [userData, setUserData] = useState({
     name: user?.name,
@@ -136,4 +136,4 @@ const ProfileContent = ({ user }) => {
   )
 }
 
-export default ProfileContent
+

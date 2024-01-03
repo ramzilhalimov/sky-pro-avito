@@ -1,17 +1,17 @@
-import Footer from '../../components/Footer/Footer'
-import Header from '../../components/Header/Header'
-import MainMenu from '../../components/MainMenu/MainMenu'
+import {Footer} from '../../components/Footer/Footer'
+import {Header} from '../../components/Header/Header'
+import {MainMenu} from '../../components/MainMenu/MainMenu'
 import * as S from './SellerProfilePagesStyle'
 import {
   useGetAdsCurrentUserQuery,
   useGetUserInfoQuery,
 } from '../../Service/AdsApi'
 import { useState } from 'react'
-import CardsItemComponent from '../../components/CardsItemComponent/CardsItemComponent'
+import {CardsItemComponent} from '../../components/CardsItemComponent/CardsItemComponent'
 import { Loader } from '../../helpers'
 import { useParams, useNavigate } from 'react-router-dom'
 
-const SellerProfilePages = () => {
+export const SellerProfilePages = () => {
   
   const [phone, setPhone] = useState(false)
   const { id } = useParams()
@@ -127,4 +127,3 @@ const SellerProfilePages = () => {
   )
 }
 
-export default SellerProfilePages

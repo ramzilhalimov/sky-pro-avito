@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   email: '',
@@ -12,20 +12,19 @@ const initialState = {
   phone: '',
   surname: '',
   id: 0,
-}
+};
 
 export const authorizationSlice = createSlice({
   name: 'authorization',
   initialState,
   reducers: {
     setAuthorization: (state, action) => {
-      const { access, refresh } = action.payload ?? initialState
-      state.access = access
-      state.refresh = refresh
+      state.access_token = action.payload.access_token || '';
+      state.refresh_token = action.payload.refresh_token || '';
     },
   },
-})
+});
 
-export const { setAuthorization } = authorizationSlice.actions
+export const { setAuthorization } = authorizationSlice.actions;
 
-export default authorizationSlice.reducer
+export default authorizationSlice.reducer;

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAddCommentMutation } from '../../../Service/AdsApi'
-import Footer from '../../Footer/Footer'
+import { Footer } from '../../Footer/Footer'
 import { Header } from '../../Header/HeaderStyle'
 import * as S from './ReviewsModalStyle'
 import { ReviewItem } from './ReviewItem'

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import * as S from './MainMenuStyle'
 
-const MainMenu = () => {
+export const MainMenu = () => {
   const navigate = useNavigate()
 
   return (
@@ -18,4 +18,4 @@ const MainMenu = () => {
   )
 }
 
-export default MainMenu
+

@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import * as S from './HeaderStyle'
-import AddModal from '../Modal/AddModal/AddModal'
+import {AddModal} from '../Modal/AddModal/AddModal'
 import { useState } from 'react'
 
-const Header = ({ data, profileKey, Authorization }) => {
+export const Header = ({ data, profileKey, Authorization }) => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -67,4 +67,3 @@ const Header = ({ data, profileKey, Authorization }) => {
   )
 }
 
-export default Header
