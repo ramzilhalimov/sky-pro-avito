@@ -3,7 +3,7 @@ import * as S from './SignupStyle'
 import { useNavigate } from 'react-router-dom'
 import { useRegisterUserMutation } from '../../../Service/AuthApi'
 
-const Signup = () => {
+export const Signup = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -103,5 +103,3 @@ const Signup = () => {
     </S.Wrapper>
   )
 }
-
-export default Signup

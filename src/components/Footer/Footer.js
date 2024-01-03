@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import AddModal from '../Modal/AddModal/AddModal'
+import {AddModal} from '../Modal/AddModal/AddModal'
 import * as S from './FooterStyle'
 
-const Footer = ({ data }) => {
+ export const Footer = ({ data }) => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   return (
@@ -45,4 +45,4 @@ const Footer = ({ data }) => {
   )
 }
 
-export default Footer
+

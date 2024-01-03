@@ -167,4 +167,4 @@ export const EditModal = ({ data, onClose }) => {
   )
 }
 
-export default EditModal
+

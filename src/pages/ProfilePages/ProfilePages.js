@@ -1,15 +1,15 @@
 import * as S from './ProfilePagesStyle'
-import Footer from '../../components/Footer/Footer'
-import Header from '../../components/Header/Header'
-import ProfileContent from '../../components/ProfileContent/ProfileContent'
+import { Footer } from '../../components/Footer/Footer'
+import { Header } from '../../components/Header/Header'
+import { ProfileContent } from '../../components/ProfileContent/ProfileContent'
 import {
   useGetAdsCurrentUserQuery,
   useGetUserInfoQuery,
 } from '../../Service/AdsApi'
-import CardsItemComponent from '../../components/CardsItemComponent/CardsItemComponent'
+import { CardsItemComponent } from '../../components/CardsItemComponent/CardsItemComponent'
 import { Loader } from '../../helpers'
 
-const ProfilePages = () => {
+export const ProfilePages = () => {
   const { data, isLoading } = useGetAdsCurrentUserQuery()
   const { data: user, isLoading: isLoading2 } = useGetUserInfoQuery()
 
@@ -47,5 +47,3 @@ const ProfilePages = () => {
     </S.Wrapper>
   )
 }
-
-export default ProfilePages

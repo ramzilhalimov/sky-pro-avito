@@ -5,16 +5,16 @@ import {
   useDeleteAdsMutation,
 } from '../../Service/AdsApi'
 import * as S from './AdvPagesStyle'
-import Footer from '../../components/Footer/Footer'
-import Header from '../../components/Header/Header'
-import MainMenu from '../../components/MainMenu/MainMenu'
+import { Footer } from '../../components/Footer/Footer'
+import { Header } from '../../components/Header/Header'
+import { MainMenu } from '../../components/MainMenu/MainMenu'
 import { useState, useEffect } from 'react'
 import { ReviewsModal } from '../../components/Modal/ReviewsModal/ReviewsModal'
-import EditModal from '../../components/Modal/EditModal/EditModal'
+import { EditModal } from '../../components/Modal/EditModal/EditModal'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { Loader } from '../../helpers'
 
-const AdvPages = () => {
+export const AdvPages = () => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isModalOpenReviews, setIsModalOpenReviews] = useState(false)
@@ -250,5 +250,3 @@ const AdvPages = () => {
     </div>
   )
 }
-
-export default AdvPages

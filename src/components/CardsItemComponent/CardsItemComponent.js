@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import * as S from './CardsItemComponentStyle'
 import { Loader } from '../../helpers'
 
-const CardsItemComponent = ({
+export const CardsItemComponent = ({
   place,
   isLoading,
   picture,
@@ -37,4 +37,4 @@ const CardsItemComponent = ({
   )
 }
 
-export default CardsItemComponent
+

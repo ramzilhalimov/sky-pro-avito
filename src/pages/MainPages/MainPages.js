@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
-import CardsItemComponent from '../../components/CardsItemComponent/CardsItemComponent'
-import Footer from '../../components/Footer/Footer'
-import Header from '../../components/Header/Header'
+import {CardsItemComponent} from '../../components/CardsItemComponent/CardsItemComponent'
+import {Footer} from '../../components/Footer/Footer'
+import {Header} from '../../components/Header/Header'
 import Search from '../../components/Search/Search'
 import { useGetAllAdsQuery, useGetUserInfoQuery } from '../../Service/AdsApi'
 import * as S from './MainPagesStyle'
@@ -9,7 +9,7 @@ import { setAds } from '../../store/slices/userSlice'
 import { useEffect, useState } from 'react'
 import { Loader } from '../../helpers'
 
-const MainPages = () => {
+export const MainPages = () => {
   const dispatch = useDispatch()
   const [searchValue, setSearchValue] = useState('')
   const [searchResults, setSearchResults] = useState([])
@@ -108,4 +108,4 @@ const MainPages = () => {
   )
 }
 
-export default MainPages
+
